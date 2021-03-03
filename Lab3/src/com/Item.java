@@ -37,7 +37,7 @@ public class Item {
 		
 		// create a prepared statement
 		
-	String query = " insert into items(`itemID`,`itemCode`,`itemName`,`itemPrice`,`itemDesc`)"+ " values (?, ?, ?, ?, ?)";
+	String query = " insert into item(`itemID`,`itemCode`,`itemName`,`itemPrice`,`itemDesc`)"+ " values (?, ?, ?, ?, ?)";
 	
 	PreparedStatement preparedStmt = con.prepareStatement(query);
 	
@@ -80,12 +80,12 @@ public class Item {
 			}
 			 // Prepare the html table to be displayed
 		
-			 output = "<table border=‘1’><tr><th>Item Code</th>"
+			 output = "<table border=â€˜1â€™><tr><th>Item Code</th>"
 			  +"<th>Item Name</th><th>Item Price</th>"
 			  + "<th>Item Description</th>"
 			  + "<th>Update</th><th>Remove</th></tr>";
 			
-			 String query = "select * from items";
+			 String query = "select * from item";
 			 Statement stmt = con.createStatement();
 			 ResultSet rs = stmt.executeQuery(query);
 			 
@@ -104,14 +104,20 @@ public class Item {
 				
 				output += "<td>" + itemDesc + "</td>";
 				 // buttons
-				 output += "<td><input name=‘btnUpdate’ "
-				 + " type=‘button’ value=‘Update’></td>"
-				 + "<td><form method=‘post’ action=‘items.jsp’>"
-				 + "<input name=‘btnRemove’ "
-				 + " type=‘submit’ value=‘Remove’>"
-				 + "<input name=‘itemID’ type=‘hidden’ "
-				 + " value=‘" + itemID + "‘>" + "</form></td></tr>";
-			 	}
+				output += "<td>"
+						+ "<form method='post' action='update.jsp'> "
+						+ "<input name='btnUpdate' type='submit' value='Update' class='btn btn-danger'>"
+						+ "<input name='itemID' type='hidden' value='" + itemID + "'>" + ""
+						+ "</form"
+						+ "</td>"
+						+ "<td>"
+						+ "<form method='post' action='item.jsp'>"
+						+ "<input name='btnRemove' type='submit' value='Remove' class='btn btn-danger'>"
+						+ "<input name='itemID' type='hidden' value='" + itemID + "'>" + ""
+						+ "</form"
+						+ "</td>"
+						+ "</tr>";
+				}
 			 con.close();
 			 // Complete the html table
 			 output += "</table>";
@@ -124,6 +130,79 @@ public class Item {
 		
 			return output;
 	}
+	
+	public String deleteItem(String itemID)
+	{
+	String output = "";
+	try
+	{
+	Connection con = connect();
+	if (con == null)
+	{
+	return "Error while connecting to the database for deleting.";
+	}
+	// create a prepared statement
+	String query = "delete from item where itemID=?";
+	PreparedStatement preparedStmt = con.prepareStatement(query);
+	// binding values
+	preparedStmt.setInt(1, Integer.parseInt(itemID));
+	// execute the statement
+	preparedStmt.execute();
+	con.close();
+	output = "Deleted successfully";
+	}
+	catch (Exception e)
+	{
+	output = "Error while deleting the item.";
+	System.err.println(e.getMessage());
+	}
+	return output;
+	}
+	
+	public String updateItem(String itemCode, String itemName, String itemPrice, String itemDesc) 
+	{
+		
+		String output = "";
+		
+		try {
+			
+			Connection con = connect();
+			
+			if (con == null)
+			{
+				return "Error while connecting to the database for reading.";
+			}
+			
+			
+						String sql = "update item set itemName=?, itemPrice=?, itemDesc=?" + "where itemCode=" + itemCode;
+						
+						PreparedStatement preparedStmt = con.prepareStatement(sql);
+						
+						
+						preparedStmt.setString(1, itemName);
+						preparedStmt.setDouble(2, Double.parseDouble(itemPrice));
+						preparedStmt.setString(3, itemDesc);
+						
+					
+						preparedStmt.execute();
+						con.close();
+						
+						output = "Updated successfully";
+			
+		}catch(Exception e) {
+			output = "Error while updating";
+			System.err.println(e.getMessage());
+		}
+		return output;
+		
+		
+	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
